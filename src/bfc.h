@@ -32,6 +32,6 @@ typedef struct
 bfc_t *bfc_new (size_t, size_t);
 int bfc_exec_string (bfc_t *, char *);
 void bfc_compile_string (bfc_t *, char *, char *);
-int bfc_exec_file (bfc_t *, char *, char *);
+int bfc_exec_file (bfc_t *, char *);
 void bfc_compile_file (bfc_t *, char *, char *);
 void bfc_release (bfc_t *);
