@@ -24,14 +24,14 @@ typedef struct
   gcc_jit_block **loop_test;
   gcc_jit_block **loop_body;
   gcc_jit_block **loop_after;
-  unsigned int num_paren;
-  
+  size_t num_paren;
+  size_t max_paren;  
   gcc_jit_result *result;
 } bfc_t;
 
 bfc_t *bfc_new (size_t, size_t);
 int bfc_exec_string (bfc_t *, char *);
 void bfc_compile_string (bfc_t *, char *, char *);
-void bfc_compile_file (bfc_t *, char *, char *);
 int bfc_exec_file (bfc_t *, char *, char *);
+void bfc_compile_file (bfc_t *, char *, char *);
 void bfc_release (bfc_t *);

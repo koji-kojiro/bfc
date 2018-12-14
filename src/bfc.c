@@ -17,7 +17,8 @@ static void _bfc_handle_dot (bfc_t *);
 static void _bfc_handle_comma (bfc_t *);
 static void _bfc_handle_lparen (bfc_t *);
 static void _bfc_handle_rparen (bfc_t *);
-static void _bfc_read_and_parse (bfc_t *, char *);
+static void _bfc_compile_char (bfc_t *, char);
+static void _bfc_compile_string (bfc_t *, char *);
 
 bfc_t *
 bfc_new (size_t memory_size, size_t max_paren)
@@ -60,8 +61,9 @@ bfc_new (size_t memory_size, size_t max_paren)
       self->ctxt, NULL, GCC_JIT_GLOBAL_EXPORTED,
       self->mem_type, "memory");
   self->pointer =
-    gcc_jit_function_new_local (
-      self->main_func, NULL, self->ptr_type, "pointer");
+    gcc_jit_context_new_global (
+      self->ctxt, NULL, GCC_JIT_GLOBAL_EXPORTED,
+      self->ptr_type, "pointer");
 
   self->byte_zero =
     gcc_jit_context_zero (self->ctxt, self->byte_type);
@@ -104,15 +106,29 @@ bfc_release (bfc_t *self)
 int
 bfc_exec_string (bfc_t *self, char *s)
 {
-  _bfc_read_and_parse (self, s);
+  _bfc_compile_string (self, s);
   return _bfc_compile_and_run (self);
 }
 
 void
-bfc_compile_string (bfc_t *self, char *s, char *fname)
+bfc_compile_string (bfc_t *self, char *s, char *dst)
 {
-  _bfc_read_and_parse (self, s);
-  _bfc_compile_to_file (self, fname);
+  _bfc_compile_string (self, s);
+  _bfc_compile_to_file (self, dst);
+}
+
+void
+bfc_compile_file (bfc_t *self, char *src, char *dst)
+{
+  FILE *fp = fopen (src, "r");
+  if (!fp)
+    _bfc_fatal_error (self, "failed to open file.");
+  
+  while (!feof (fp))
+    _bfc_compile_char (self, fgetc (fp));
+
+  fclose (fp);
+  _bfc_compile_to_file (self, dst);
 }
 
 static void
@@ -232,37 +248,43 @@ _bfc_handle_rparen (bfc_t *self)
 }
 
 static void
-_bfc_read_and_parse (bfc_t *self, char *s)
+_bfc_compile_char (bfc_t *self, char c)
+{
+  switch (c) {
+    case '+':
+      _bfc_handle_plus (self);
+      break;
+    case '-':
+      _bfc_handle_minus (self);
+      break;
+    case '<':
+      _bfc_handle_lshift (self);
+      break;
+    case '>':
+      _bfc_handle_rshift (self);
+      break;
+    case '.':
+      _bfc_handle_dot (self);
+      break;
+    case ',':
+      _bfc_handle_comma (self);
+      break;
+    case '[':
+      _bfc_handle_lparen (self);
+      break;
+    case ']':
+      _bfc_handle_rparen (self);
+      break;
+    default:
+      break;
+  }
+}
+
+static void
+_bfc_compile_string (bfc_t *self, char *s)
 {
   while (*s)
-    switch (*s++) {
-      case '+':
-        _bfc_handle_plus (self);
-        break;
-      case '-':
-        _bfc_handle_minus (self);
-        break;
-      case '<':
-        _bfc_handle_lshift (self);
-        break;
-      case '>':
-        _bfc_handle_rshift (self);
-        break;
-      case '.':
-        _bfc_handle_dot (self);
-        break;
-      case ',':
-        _bfc_handle_comma (self);
-        break;
-      case '[':
-        _bfc_handle_lparen (self);
-        break;
-      case ']':
-        _bfc_handle_rparen (self);
-        break;
-      default:
-        break;
-    }
+    _bfc_compile_char (self, *s++);
 }
 
 static void
