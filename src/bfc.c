@@ -7,6 +7,7 @@ static gcc_jit_lvalue *_bfc_get_value (bfc_t *);
 static gcc_jit_lvalue *_bfc_get_pointer (bfc_t *);
 static void _bfc_fatal_error (bfc_t *, const char *);
 static void _bfc_compile (bfc_t *);
+static void _bfc_compile_to_file (bfc_t *, char *);
 static int _bfc_compile_and_run (bfc_t *);
 static void _bfc_handle_plus (bfc_t *);
 static void _bfc_handle_minus (bfc_t *);
@@ -105,6 +106,13 @@ bfc_exec_string (bfc_t *self, char *s)
 {
   _bfc_read_and_parse (self, s);
   return _bfc_compile_and_run (self);
+}
+
+void
+bfc_compile_string (bfc_t *self, char *s, char *fname)
+{
+  _bfc_read_and_parse (self, s);
+  _bfc_compile_to_file (self, fname);
 }
 
 static void
@@ -279,6 +287,18 @@ _bfc_compile_and_run (bfc_t *self)
     return main_func (0, NULL);
   }
   return 1;
+}
+
+static void
+_bfc_compile_to_file (bfc_t *self, char *fname)
+{
+  if (self->num_paren > 0)
+    _bfc_fatal_error (self, "unbalanced parentheses");
+  gcc_jit_block_end_with_return (
+    self->block, NULL, gcc_jit_context_zero (
+      self->ctxt, gcc_jit_context_get_type (self->ctxt, GCC_JIT_TYPE_INT))); 
+  gcc_jit_context_compile_to_file (
+    self->ctxt, GCC_JIT_OUTPUT_KIND_EXECUTABLE, fname);
 }
 
 
