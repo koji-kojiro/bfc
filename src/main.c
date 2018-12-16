@@ -30,7 +30,7 @@ show_version (char *prog)
 static void
 show_hint(char *prog, const char* msg)
 {
-  printf ("%s: try `%s -h`\n", msg, prog);
+  printf ("bfc: error: %s; try `%s -h`\n", msg, prog);
   exit (1);
 }
 

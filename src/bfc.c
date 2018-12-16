@@ -26,6 +26,8 @@ bfc_new (size_t memory_size, size_t max_paren)
 {
   bfc_t *self = malloc (sizeof (bfc_t));
   self->ctxt = gcc_jit_context_acquire ();
+  gcc_jit_context_set_str_option (
+    self->ctxt, GCC_JIT_STR_OPTION_PROGNAME, "bfc");
 
   self->byte_type =
     gcc_jit_context_get_type (self->ctxt, GCC_JIT_TYPE_CHAR);
@@ -135,7 +137,7 @@ bfc_compile_file (bfc_t *self, char *src, char *dst)
 static void
 _bfc_fatal_error (bfc_t *self, const char *msg)
 {
-  printf ("%s\n", msg);
+  printf ("bfc: error: %s\n", msg);
   exit (1);
 }
 
