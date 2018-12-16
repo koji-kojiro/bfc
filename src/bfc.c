@@ -19,6 +19,7 @@ static void _bfc_handle_lparen (bfc_t *);
 static void _bfc_handle_rparen (bfc_t *);
 static void _bfc_compile_char (bfc_t *, char);
 static void _bfc_compile_string (bfc_t *, char *);
+static void _bfc_compile_file (bfc_t *, char *);
 
 bfc_t *
 bfc_new (size_t memory_size, size_t max_paren)
@@ -117,17 +118,17 @@ bfc_compile_string (bfc_t *self, char *s, char *dst)
   _bfc_compile_to_file (self, dst);
 }
 
+int
+bfc_exec_file (bfc_t *self, char *src)
+{
+  _bfc_compile_file (self, src);
+  return _bfc_compile_and_run (self);
+}
+
 void
 bfc_compile_file (bfc_t *self, char *src, char *dst)
 {
-  FILE *fp = fopen (src, "r");
-  if (!fp)
-    _bfc_fatal_error (self, "failed to open file.");
-  
-  while (!feof (fp))
-    _bfc_compile_char (self, fgetc (fp));
-
-  fclose (fp);
+  _bfc_compile_file (self, src);
   _bfc_compile_to_file (self, dst);
 }
 
@@ -286,6 +287,20 @@ _bfc_compile_string (bfc_t *self, char *s)
   while (*s)
     _bfc_compile_char (self, *s++);
 }
+
+static void
+_bfc_compile_file (bfc_t *self, char *src)
+{
+  FILE *fp = fopen (src, "r");
+  if (!fp)
+    _bfc_fatal_error (self, "failed to open file.");
+  
+  while (!feof (fp))
+    _bfc_compile_char (self, fgetc (fp));
+
+  fclose (fp);
+}
+
 
 static void
 _bfc_compile (bfc_t *self)
