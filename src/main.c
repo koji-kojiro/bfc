@@ -40,7 +40,7 @@ int
 main (int argc, char *argv[])
 {
   int c;
-  char *src;
+  char *src = NULL;
   char *dst = "a.out";
   size_t mem_size = 1024;
   size_t opt_level = 0;
