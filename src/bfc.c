@@ -136,7 +136,7 @@ static void
 _bfc_fatal_error (bfc_t *self, const char *msg)
 {
   printf ("%s\n", msg);
-  abort ();
+  exit (1);
 }
 
 static gcc_jit_lvalue *
