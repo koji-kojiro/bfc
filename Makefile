@@ -1,20 +1,17 @@
 CC ?= gcc
-CFLAGS = -o2 -Wall -std=c11
+CFLAGS = -o2 -Wall -std=gnu11
 LDFLAGS = -lgccjit
 SRCS = $(wildcard src/*.c)
 OBJS = $(SRCS:.c=.o)
-BIN = ./bfc
+PROG = ./bfc
 
-.phony: clean all run
+.phony: clean all
 
-all: $(BIN)
+all: $(PROG)
 
-run: all
-	@$(BIN)
-
-$(BIN): $(OBJS)
+$(PROG): $(OBJS)
 	$(CC) $^ $(CFLAGS) -o $@ $(LDFLAGS)
 
 clean:
-	@rm -fv $(BIN)
+	@rm -fv $(PROG)
 	@rm -fv $(OBJS)
