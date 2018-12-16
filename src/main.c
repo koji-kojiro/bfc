@@ -14,7 +14,7 @@ show_help (char *prog)
   printf ("options:\n");
   printf ("  -h         show this screen and exit\n");
   printf ("  -m <size>  specify memory size in bytes (default 1024)\n");
-  printf ("  -o <file>  place the output into <file> (default `a.out`)\n");
+  printf ("  -o <file>  place the output into <file> (default a.out)\n");
   printf ("  -r         execute file directly\n");
   printf ("  -v         show version info and exit\n\n");
   exit(1);
@@ -86,7 +86,6 @@ main (int argc, char *argv[])
   if (aot)
     bfc_compile_file (bfc, src, dst);
   else
-    bfc_exec_file (bfc, src);
-  bfc_release (bfc);
+    return bfc_exec_file (bfc, src);
   return 0;
 }
