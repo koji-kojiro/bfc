@@ -30,7 +30,7 @@ typedef struct
   gcc_jit_result *result;
 } bfc_t;
 
-bfc_t *bfc_new (size_t, size_t);
+bfc_t *bfc_new (size_t, size_t, size_t);
 int bfc_exec_string (bfc_t *, char *);
 void bfc_compile_string (bfc_t *, char *, char *);
 int bfc_exec_file (bfc_t *, char *);

@@ -12,11 +12,12 @@ show_help (char *prog)
 {
   printf ("usage: %s [options] file\n\n", prog);
   printf ("options:\n");
-  printf ("  -h         show this screen and exit\n");
-  printf ("  -m <size>  specify memory size in bytes (default 1024)\n");
-  printf ("  -o <file>  place the output into <file> (default a.out)\n");
-  printf ("  -r         execute file directly\n");
-  printf ("  -v         show version info and exit\n\n");
+  printf ("  -h          show this screen and exit\n");
+  printf ("  -m <size>   specify memory size in bytes (default 1024)\n");
+  printf ("  -o <file>   place the output into <file> (default a.out)\n");
+  printf ("  -O <level>  set optimization level (from 1 to 3, default 0)\n");
+  printf ("  -r          execute file directly\n");
+  printf ("  -v          show version info and exit\n\n");
   exit(1);
 }
 
@@ -41,19 +42,23 @@ main (int argc, char *argv[])
   char *src;
   char *dst = "a.out";
   size_t mem_size = 1024;
+  size_t opt_level = 0;
   bool aot = true;
   char *prog = basename (argv[0]);
   
   opterr = false;
 
-  while ((c = getopt (argc, argv, "rhvo:m:")) != -1)
+  while ((c = getopt (argc, argv, "rhvo:m:O:")) != -1)
     switch (c) {
       case 'o':
         dst = malloc (strlen (optarg) + 1);
         strcpy (dst, optarg);
         break;
+      case 'O':
+        opt_level = atoi (optarg);
       case 'm':
         mem_size = atoi (optarg);
+        break;
       case 'r':
         aot = false;
         break;
@@ -67,7 +72,6 @@ main (int argc, char *argv[])
         show_hint (prog, "invalid argument");
         break;
     }
-  
   switch (argc - optind) {
     case 0:
       show_hint (prog, "missing filename");
@@ -81,7 +85,7 @@ main (int argc, char *argv[])
       break; 
   }
 
-  bfc_t *bfc = bfc_new (mem_size, 2000);
+  bfc_t *bfc = bfc_new (mem_size, 2000, opt_level);
 
   if (aot)
     bfc_compile_file (bfc, src, dst);

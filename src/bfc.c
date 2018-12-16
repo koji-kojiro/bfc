@@ -22,12 +22,14 @@ static void _bfc_compile_string (bfc_t *, char *);
 static void _bfc_compile_file (bfc_t *, char *);
 
 bfc_t *
-bfc_new (size_t memory_size, size_t max_paren)
+bfc_new (size_t memory_size, size_t max_paren, size_t opt_level)
 {
   bfc_t *self = malloc (sizeof (bfc_t));
   self->ctxt = gcc_jit_context_acquire ();
   gcc_jit_context_set_str_option (
     self->ctxt, GCC_JIT_STR_OPTION_PROGNAME, "bfc");
+  gcc_jit_context_set_int_option (
+    self->ctxt, GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL, opt_level);
 
   self->byte_type =
     gcc_jit_context_get_type (self->ctxt, GCC_JIT_TYPE_CHAR);
